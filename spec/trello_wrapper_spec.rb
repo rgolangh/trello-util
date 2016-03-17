@@ -30,14 +30,14 @@ USER         = ENV['TRELLO_USER']
 
     it "shows all board lists" do
       lists = trelloUtil.getLists
-      lists.each {|l| puts l.id}
+      lists.each {|l| puts "list name #{l.name}"}
       expect(lists.size).to be > 0
     end
 
-    it "adds member to card" do
+    it "adds a member to card" do
       card = trelloUtil.addCard("Test adding a member")
-      trelloUtil.add_member(card.id, user )
-      card.members.each {|m| puts m.id}
+      trelloUtil.add_member(card.id, user)
+      expect(card.members).to include(user.id)
       card.delete
     end
 
@@ -45,12 +45,15 @@ USER         = ENV['TRELLO_USER']
       card = trelloUtil.addCard("Test removing a member")
       trelloUtil.add_member(card.id, user)
       trelloUtil.remove_member(card.id, user)
-      card.members.each {|m| puts m.id}
+      expect(card.members).not_to include(user.id)
       card.delete
     end
 
     it "fetches cards by last 2 weeks of activity" do
-      cards = trelloUtil.fetchCards(lambda {|card| !card.id.nil?})
+      cards = trelloUtil.fetchCards(lambda {|card| card.last_activity_date > Date.today - 14 })
+      card = trelloUtil.addCard("test for last activity card")
+      cards.each {|c| puts "filtered card #{c.name} with last activity #{c.last_activity_date} "}
       expect(cards.size).to be > 0
+      card.delete
     end
   end

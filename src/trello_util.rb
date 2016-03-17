@@ -43,6 +43,6 @@ class TrelloUtil
   end
 
   def fetchCards(cardFilter)
-    @board.lists.flat_map {|list| list}.select {cardFilter}
+    @board.cards.select &cardFilter
   end
 end
